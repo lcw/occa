@@ -2,16 +2,18 @@
 
 #include "occa.hpp"
 
+#define VEC 8
+
 int main(int argc, char **argv){
   occa::printAvailableDevices();
 
   int entries = 1024;
 
-  float *a  = new float[4*entries];
-  float *b  = new float[4*entries];
-  float *ab = new float[4*entries];
+  float *a  = new float[VEC*entries];
+  float *b  = new float[VEC*entries];
+  float *ab = new float[VEC*entries];
 
-  for(int i = 0; i < 4*entries; ++i){
+  for(int i = 0; i < VEC*entries; ++i){
     a[i]  = i;
     b[i]  = 1 - i;
     ab[i] = 0;
@@ -24,7 +26,7 @@ int main(int argc, char **argv){
 
   //---[ Device setup with string flags ]-------------------
   // device.setup("mode = Serial");
-  device.setup("mode = OpenMP  , schedule = compact, chunk = 256");
+  device.setup("mode = OpenMP  , schedule = compact, chunk = 32");
   // device.setup("mode = OpenCL  , platformID = 0, deviceID = 1");
   // device.setup("mode = CUDA    , deviceID = 0");
   // device.setup("mode = Pthreads, threadCount = 4, schedule = compact, pinnedCores = [0, 0, 1, 1]");
@@ -52,13 +54,20 @@ int main(int argc, char **argv){
   //                 occa::deviceID = 0);
   //========================================================
 
-  o_a  = device.malloc(4*entries*sizeof(float));
-  o_b  = device.malloc(4*entries*sizeof(float));
-  o_ab = device.malloc(4*entries*sizeof(float));
+  o_a  = device.malloc(VEC*entries*sizeof(float));
+  o_b  = device.malloc(VEC*entries*sizeof(float));
+  o_ab = device.malloc(VEC*entries*sizeof(float));
+
+  occa::kernelInfo  info;
+  if(VEC == 4)
+    info.addDefine("vfloat", "float4");
+  else
+    info.addDefine("vfloat", "float8");
+
+  std::string kernelSrc = (VEC==4) ? "simd4.occa" : "simd.occa";
 
   // OKL: OCCA Kernel Language
-  simd = device.buildKernelFromSource("simd.occa",
-                                      "simd");
+  simd = device.buildKernelFromSource(kernelSrc, "simd", info);
 
   //---[ Don't need to set these up when using OKL/OFL ]----
   int dims = 1;
@@ -75,7 +84,7 @@ int main(int argc, char **argv){
 
   o_ab.copyTo(ab);
 
-  for(int i = 0; i < 4*entries; ++i){
+  for(int i = 0; i < VEC*entries; ++i){
     if(ab[i] != (a[i] + b[i]))
       throw 1;
   }
