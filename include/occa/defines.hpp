@@ -114,12 +114,6 @@
 #  define OCCA_CHECK( _expr , _msg )
 #endif
 
-#if (OCCA_OS & OSX_OS)
-#  define OCCA_MEM_ALIGN 16
-#else
-#  define OCCA_MEM_ALIGN 16
-#endif
-
 //---[ Vectorization ]--------
 #ifdef __MIC__
 #  define OCCA_MIC 1
@@ -213,14 +207,19 @@
 
 #if   OCCA_MIC
 #  define OCCA_SIMD_WIDTH 16
+#  define OCCA_MEM_ALIGN 64
 #elif OCCA_AVX
 #  define OCCA_SIMD_WIDTH 8
+#  define OCCA_MEM_ALIGN 32
 #elif OCCA_SSE
 #  define OCCA_SIMD_WIDTH 4
+#  define OCCA_MEM_ALIGN 16
 #elif OCCA_MMX
 #  define OCCA_SIMD_WIDTH 2
+#  define OCCA_MEM_ALIGN 16
 #else
 #  define OCCA_SIMD_WIDTH 1
+#  define OCCA_MEM_ALIGN 16
 #endif
 //============================
 
