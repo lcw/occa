@@ -1,0 +1,21 @@
+#include <stdio.h>
+#define vfloat float
+occaKernel void simd(occaKernelInfoArg,
+                     occaConst int occaVariable entries,
+                     occaConst occaPointer vfloat * occaRestrict a,
+                     occaConst occaPointer vfloat * occaRestrict b,
+                     occaPointer           vfloat * occaRestrict ab){
+   a = (vfloat*)__builtin_assume_aligned(a, OCCA_MEM_ALIGN);
+   b = (vfloat*)__builtin_assume_aligned(b, OCCA_MEM_ALIGN);
+   ab = (vfloat*)__builtin_assume_aligned(ab, OCCA_MEM_ALIGN);
+  std::cout << "OCCA_MEM_ALIGN = " << OCCA_MEM_ALIGN << std::endl;
+  occaParallelFor
+  occaOuterFor0{
+    occaInnerFor0{
+      const int N = occaGlobalId0;
+
+     //  if(N < entries*4)
+        ab[N] = a[N] + b[N];
+    }
+  }
+}
