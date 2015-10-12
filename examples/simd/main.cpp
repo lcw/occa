@@ -2,7 +2,7 @@
 
 #include "occa.hpp"
 
-#define VEC 8
+#define VEC 4
 
 int main(int argc, char **argv){
   occa::printAvailableDevices();
