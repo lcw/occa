@@ -6,8 +6,10 @@
 #include "xmmintrin.h"
 #include "pmmintrin.h"
 
+class vfloat4;
+
 // vector load operations
-inline void occaLoad(const float4 &SRC, float4 &DEST){
+inline void occaLoad(const vfloat4 &SRC, vfloat4 &DEST){
   
   *((__m128*)&DEST) = _mm_load_ps((float*)&SRC);
   
@@ -28,7 +30,7 @@ inline void occaLoad(const float16 &SRC, float16 &DEST){
 
 
 // vector store operations
-inline void occaStore(const float4 &SRC, float4 &DEST){
+inline void occaStore(const vfloat4 &SRC, vfloat4 &DEST){
 
   _mm_store_ps((float*)&DEST, *((__m128*)&SRC));
 
@@ -48,53 +50,53 @@ inline void occaStore(const float16 &SRC, float16 &DEST){
 
 
 // entrywise vector add (B += A)
-inline void occaAdd(const float4 &A, float4 &B){
+inline void occaAdd(const vfloat4 &A, const vfloat4 &B, vfloat4 &C){
   
-  *((__m128*)&B) = _mm_add_ps(*((__m128*)&A), *((__m128*)&B));
-  
-}
-
-inline void occaAdd(const float8 &A, float8 &B){
-  
-  *((__m256*)&B) = _mm256_add_ps(*((__m256*)&A), *((__m256*)&B));
+  *((__m128*)&C) = _mm_add_ps(*((__m128*)&A), *((__m128*)&B));
   
 }
 
-
-inline void occaAdd(const float16 &A, float16 &B){
+inline void occaAdd(const float8 &A, const float8 &B, float8 &C){
   
-  *((__m512*)&B) = _mm512_add_ps(*((__m512*)&A), *((__m512*)&B));
+  *((__m256*)&C) = _mm256_add_ps(*((__m256*)&A), *((__m256*)&B));
+  
+}
+
+
+inline void occaAdd(const float16 &A, const float16 &B, float16 &C){
+  
+  *((__m512*)&C) = _mm512_add_ps(*((__m512*)&A), *((__m512*)&B));
   
 }
 
 
 // entrywise vector multliply (B += A)
-inline void occaMultiply(const float4 &A, float4 &B){
+inline void occaMultiply(const vfloat4 &A, const vfloat4 &B, vfloat4 &C){
   
-  *((__m128*)&B) = _mm_mul_ps(*((__m128*)&A), *((__m128*)&B));
-  
-}
-
-inline void occaMultiply(const float8 &A, float8 &B){
-  
-  *((__m256*)&B) = _mm256_mul_ps(*((__m256*)&A), *((__m256*)&B));
+  *((__m128*)&C) = _mm_mul_ps(*((__m128*)&A), *((__m128*)&B));
   
 }
 
-
-inline void occaMultiply(const float16 &A, float16 &B){
+inline void occaMultiply(const float8 &A, const float8 &B, float8 &C){
   
-  *((__m512*)&B) = _mm512_mul_ps(*((__m512*)&A), *((__m512*)&B));
+  *((__m256*)&C) = _mm256_mul_ps(*((__m256*)&A), *((__m256*)&B));
+  
+}
+
+
+inline void occaMultiply(const float16 &A, const float16 &B, float16 &C){
+  
+  *((__m512*)&C) = _mm512_mul_ps(*((__m512*)&A), *((__m512*)&B));
   
 }
 
 
 // multiply all entries in a vector with the same float
-inline void occaMultiply(const float &A, const float4 &B){
+inline void occaMultiply(const float &A, const vfloat4 &B, vfloat4 &C){
 
   __m128 tmpA =  _mm_load_ps1(&A);
   
-  *((__m128*)&B) = _mm_mul_ps(tmpA, *((__m128*)&B));  
+  *((__m128*)&C) = _mm_mul_ps(tmpA, *((__m128*)&B));  
 }
 
 #if 0
@@ -115,7 +117,7 @@ inline void occaMultiply(const float &A, float16 &B){
 }
 #endif
 
-inline void occaMultiply(const float4 &A, const float &B, float4 &C){
+inline void occaMultiply(const vfloat4 &A, const float &B, vfloat4 &C){
 
   __m128 tmpB =  _mm_load_ps1(&B);
   
@@ -144,7 +146,7 @@ inline void occaMultiply(const float16 &A, const float &B, float16 &C){
 
 
 // entrywise vector multliply (B += A)
-inline void occaMultiplyAdd(const float4 &A, const float4 &B, float4 &C){
+inline void occaMultiplyAdd(const vfloat4 &A, const vfloat4 &B, vfloat4 &C){
   
   *((__m128*)&C) = _mm_fmadd_ps(*((__m128*)&A), *((__m128*)&B), *((__m128*)&C));
   
@@ -173,24 +175,66 @@ inline void occaMultiplyAdd(const float16 &A, const float16 &B, float16 &C ){
 
 #if ( (OCCA_USING_OPENCL) || (OCCA_USING_CUDA) )
 
-inline void occaLoad(const float4  &SRC, float4  &DEST){ DEST = SRC; }
+inline void occaLoad(const vfloat4  &SRC, vfloat4  &DEST){ DEST = SRC; }
 inline void occaLoad(const float8  &SRC, float8  &DEST){ DEST = SRC; }
 inline void occaLoad(const float16 &SRC, float16 &DEST){ DEST = SRC; }
 
-inline void occaStore(const float4  &SRC, float4  &DEST){  DEST = SRC; }
+inline void occaStore(const vfloat4  &SRC, vfloat4  &DEST){  DEST = SRC; }
 inline void occaStore(const float8  &SRC, float8  &DEST){  DEST = SRC; }
 inline void occaStore(const float16 &SRC, float16 &DEST){  DEST = SRC; }
 
-inline void occaAdd(const float4  &A, const float4  &B, float4  &APB){  APB = A+B; }
+inline void occaAdd(const vfloat4  &A, const vfloat4  &B, vfloat4  &APB){  APB = A+B; }
 inline void occaAdd(const float8  &A, const float8  &B, float8  &APB){  APB = A+B; }
 inline void occaAdd(const float16 &A, const float16 &B, float16 &APB){  APB = A+B; }
 
-inline void occaMultiply(const float4  &A, const float4  &B, float4  &APB){  APB = A*B; }
+inline void occaMultiply(const vfloat4  &A, const vfloat4  &B, vfloat4  &APB){  APB = A*B; }
 inline void occaMultiply(const float8  &A, const float8  &B, float8  &APB){  APB = A*B; }
 inline void occaMultiply(const float16 &A, const float16 &B, float16 &APB){  APB = A*B; }
 
-inline void occaMultiplyAdd(const float4  &A, const float4  &B, float4  &C){  C += A*B; }
+inline void occaMultiplyAdd(const vfloat4  &A, const vfloat4  &B, vfloat4  &C){  C += A*B; }
 inline void occaMultiplyAdd(const float8  &A, const float8  &B, float8  &C){  C += A*B; }
 inline void occaMultiplyAdd(const float16 &A, const float16 &B, float16 &C){  C += A*B; }
 
 #endif
+
+class vfloat4 {
+  public:
+    float x;
+    float y;
+    float z;
+    float w;
+
+ inline vfloat4()
+ {
+   cout << "Begin default constructor" << endl;
+   cout << "End   default constructor" << endl;
+ }
+
+ inline vfloat4(const vfloat4* A)
+ {
+   cout << "Begin constructor" << endl;
+   occaLoad(A, *this);
+   cout << "End   constructor" << endl;
+ }
+
+ inline vfloat4& operator=(const vfloat4 &rhs) {
+   cout << "Begin assignment" << endl;
+   occaLoad(rhs, *this);
+   cout << "End assignment" << endl;
+   return *this;
+ }
+
+ friend inline vfloat4 operator+(const vfloat4 &A, const vfloat4 &B);
+
+} __attribute__((__aligned__(16)));
+
+inline vfloat4 operator+(const vfloat4 &A, const vfloat4 &B)
+{
+   cout << "Begin add" << endl;
+  vfloat4 C;
+
+  occaAdd(A, B, C);
+
+   cout << "End add" << endl;
+  return C;
+}

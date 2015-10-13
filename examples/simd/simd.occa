@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <immintrin.h>
 
+#include "/Users/lucas/research/code/occa/examples/simd/vectorOps.hpp"
+
 occaKernel void simd(occaKernelInfoArg,
                      occaConst int occaVariable entries,
                      occaConst occaPointer vfloat * occaRestrict a,
@@ -15,12 +17,23 @@ occaKernel void simd(occaKernelInfoArg,
     occaInnerFor0{
       const int N = occaGlobalId0;
 
+#if 0
       __m256 abv = _mm256_load_ps((float*)&a[N]);
       __m256 bv  = _mm256_load_ps((float*)&b[N]);
 
       abv = _mm256_add_ps(abv,bv);
 
       _mm256_store_ps((float*)&ab[N], abv);
+#else
+      float4 abv, bv;
+
+      occaLoad(a[N], abv);
+      occaLoad(b[N], bv);
+
+      occaAdd(bv, abv);
+
+      occaStore(abv, ab[N]);
+#endif
     }
   }
 }

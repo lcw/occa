@@ -1,41 +1,14 @@
 #include <stdio.h>
 
+#include "/Users/lucas/research/code/occa/examples/simd/vectorOps.hpp"
 
-#include "xmmintrin.h"
-#include "pmmintrin.h"
-
-// Vector load/store/add/multiply/divide operations
-inline void occaLoad(const float4 &SRC, float4 &DEST){
-
-  *((__m128*)&DEST) = _mm_load_ps((float*)&SRC);
-
-}
-
-inline void occaStore(const float4 &SRC, float4 &DEST){
-  
-  _mm_store_ps((float*)&DEST, *((__m128*)&SRC));
-  
-}
-
-inline void occaAdd(const float4 &A, const float4 &B, float4 &APB){
-
-  *((__m128*)&APB) = _mm_add_ps(*((__m128*)&A), *((__m128*)&B));
-
-}
-    
-
-#define vfloat float4
+// #define vfloat float4
 occaKernel void simd(occaKernelInfoArg,
                      occaConst int occaVariable entries,
-                     occaConst occaPointer vfloat * occaRestrict a,
-                     occaConst occaPointer vfloat * occaRestrict b,
-                     occaPointer           vfloat * occaRestrict ab){
+                     occaConst occaPointer vfloat4 * occaRestrict a,
+                     occaConst occaPointer vfloat4 * occaRestrict b,
+                     occaPointer           vfloat4 * occaRestrict ab){
 
-
-
-   a = (vfloat*)__builtin_assume_aligned(a, OCCA_MEM_ALIGN);
-   b = (vfloat*)__builtin_assume_aligned(b, OCCA_MEM_ALIGN);
-   ab = (vfloat*)__builtin_assume_aligned(ab, OCCA_MEM_ALIGN);
   std::cout << "OCCA_MEM_ALIGN = " << OCCA_MEM_ALIGN << std::endl;
   occaParallelFor
   occaOuterFor0{
@@ -43,18 +16,23 @@ occaKernel void simd(occaKernelInfoArg,
       const int N = occaGlobalId0;
 
 #if 0
-      __m128 abv = _mm_load_ps((float*)&a[N]);
+      __m128 abv;
+      __m128 av = _mm_load_ps((float*)&a[N]);
       __m128 bv  = _mm_load_ps((float*)&b[N]);
 
-      abv = _mm_add_ps(abv,bv);
+      abv = _mm_add_ps(av,bv);
 
       _mm_store_ps((float*)&ab[N], abv);
-#else
-      float4 abv, bv, av;
+#elif 0
+      float4 av, bv, abv;
       occaLoad(a[N], av);
       occaLoad(b[N], bv);
       occaAdd(av, bv, abv);
       occaStore(abv, ab[N]);
+#else
+      vfloat4 av(&a[N]), bv(&b[N]), abv;
+      abv = av + bv;
+      ab[N] = abv;
 #endif
     }
   }
