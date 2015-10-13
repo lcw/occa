@@ -17,6 +17,7 @@ occaKernel void simd(occaKernelInfoArg,
       const int N = occaGlobalId0;
 
 #if 0
+    // option 4
       __m128 abv;
       __m128 av = _mm_load_ps((float*)&a[N]);
       __m128 bv  = _mm_load_ps((float*)&b[N]);
@@ -25,17 +26,19 @@ occaKernel void simd(occaKernelInfoArg,
 
       _mm_store_ps((float*)&ab[N], abv);
 #elif 0
-      float4 av, bv, abv;
+      // option 3
+      vfloat4 av, bv, abv;
       occaLoad(a[N], av);
       occaLoad(b[N], bv);
       occaAdd(av, bv, abv);
       occaStore(abv, ab[N]);
-#elif 0
+#elif 1
       // option 1
-      vfloat4 av(&a[N]), bv(&b[N]), abv;
+      vfloat4 av(a[N]), bv(b[N]), abv;
       abv = av + bv;
       ab[N] = abv;
-#elif 1
+#elif 0
+      // option 2
       ab[N] = a[N] + b[N];
 #endif
     }

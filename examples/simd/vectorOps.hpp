@@ -217,10 +217,10 @@ class vfloat4 {
    //   cout << "End   default constructor" << endl;
  }
 
- inline vfloat4(const vfloat4* A)
+ inline vfloat4(const vfloat4 &A)
  {
    //   cout << "Begin constructor" << endl;
-   occaLoad(*A, *this);
+   occaLoad(A, *this);
    //   cout << "End   constructor" << endl;
  }
 
