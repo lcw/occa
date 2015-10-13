@@ -6,12 +6,19 @@
 #include "xmmintrin.h"
 #include "pmmintrin.h"
 
+#include <iostream>
+using namespace std;
+
 class vfloat4;
 
 // vector load operations
 inline void occaLoad(const vfloat4 &SRC, vfloat4 &DEST){
   
+  //  cout << " begin occaLoad " << endl;
+
   *((__m128*)&DEST) = _mm_load_ps((float*)&SRC);
+
+  //  cout << " end occaLoad " << endl;
   
 }
 
@@ -206,21 +213,21 @@ class vfloat4 {
 
  inline vfloat4()
  {
-   cout << "Begin default constructor" << endl;
-   cout << "End   default constructor" << endl;
+   //   cout << "Begin default constructor" << endl;
+   //   cout << "End   default constructor" << endl;
  }
 
  inline vfloat4(const vfloat4* A)
  {
-   cout << "Begin constructor" << endl;
-   occaLoad(A, *this);
-   cout << "End   constructor" << endl;
+   //   cout << "Begin constructor" << endl;
+   occaLoad(*A, *this);
+   //   cout << "End   constructor" << endl;
  }
 
  inline vfloat4& operator=(const vfloat4 &rhs) {
-   cout << "Begin assignment" << endl;
+   //   cout << "Begin assignment" << endl;
    occaLoad(rhs, *this);
-   cout << "End assignment" << endl;
+   //   cout << "End assignment" << endl;
    return *this;
  }
 
@@ -230,11 +237,11 @@ class vfloat4 {
 
 inline vfloat4 operator+(const vfloat4 &A, const vfloat4 &B)
 {
-   cout << "Begin add" << endl;
+  //   cout << "Begin add" << endl;
   vfloat4 C;
 
   occaAdd(A, B, C);
 
-   cout << "End add" << endl;
+  //   cout << "End add" << endl;
   return C;
 }

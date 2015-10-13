@@ -1,6 +1,7 @@
 #include <stdio.h>
 
-#include "/Users/lucas/research/code/occa/examples/simd/vectorOps.hpp"
+// #include "/Users/lucas/research/code/occa/examples/simd/vectorOps.hpp"
+#include "/home/timwar/Work/git/LW/occa.lw/examples/simd/vectorOps.hpp"
 
 // #define vfloat float4
 occaKernel void simd(occaKernelInfoArg,
@@ -29,10 +30,13 @@ occaKernel void simd(occaKernelInfoArg,
       occaLoad(b[N], bv);
       occaAdd(av, bv, abv);
       occaStore(abv, ab[N]);
-#else
+#elif 0
+      // option 1
       vfloat4 av(&a[N]), bv(&b[N]), abv;
       abv = av + bv;
       ab[N] = abv;
+#elif 1
+      ab[N] = a[N] + b[N];
 #endif
     }
   }
