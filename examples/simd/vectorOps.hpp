@@ -232,6 +232,7 @@ class vfloat4 {
  }
 
  friend inline vfloat4 operator+(const vfloat4 &A, const vfloat4 &B);
+ friend inline vfloat4 operator*(const float   &A, const vfloat4 &B);
 
 } __attribute__((__aligned__(16)));
 
@@ -239,9 +240,15 @@ inline vfloat4 operator+(const vfloat4 &A, const vfloat4 &B)
 {
   //   cout << "Begin add" << endl;
   vfloat4 C;
-
   occaAdd(A, B, C);
-
-  //   cout << "End add" << endl;
   return C;
+}
+
+inline vfloat4 operator*(const float &A, const vfloat4 &B)
+{
+  //   cout << "Begin multiply" << endl;
+  vfloat4 C;
+  occaMultiply(A, B, C);
+  return C;
+  //   cout << "End multiply" << endl;
 }
