@@ -1,0 +1,6 @@
+occaFunction void f(occaConst float a,
+                    occaConst float b,
+                              float *ab)
+{
+  *ab = a + b;
+}

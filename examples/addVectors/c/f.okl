@@ -1,0 +1,4 @@
+void f(const float a, const float b, float *ab)
+{
+  *ab = a + b;
+}
